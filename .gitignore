@@ -1,14 +1,17 @@
-# dependencies
+# dependencies (frontend + backend)
 node_modules/
 
-# build outputs
-dist/
-build/
+# frontend build
+client/dist/
+client/build/
+
+# backend build (future)
+server/dist/
+server/build/
 
 # environment files
 .env
 .env.local
-.env.development
 .env.production
 
 # logs
