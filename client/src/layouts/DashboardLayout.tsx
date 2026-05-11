@@ -1,74 +1,110 @@
 import React, { useState } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 
-type Props = {
-  children: React.ReactNode;
-};
-
-const DashboardLayout = ({ children }: Props) => {
+const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+  const navigate = useNavigate();
+
+  // 🔐 TEMP USER (later from backend)
+  const user = {
+    name: "Ben",
+    role: "Librarian",
+  };
+
+  const schoolName = "My School"; // later from DB
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleTheme = () => setDarkMode(!darkMode);
+
+  const handleLogout = () => {
+    // later: clear token/session
+    navigate("/");
   };
 
   return (
-    <div style={styles.container}>
-
-      {/* HEADER */}
+    <div
+      style={{
+        ...styles.container,
+        background: darkMode ? "#0f172a" : "#f1f5f9",
+        color: darkMode ? "white" : "black",
+      }}
+    >
+      {/* ================= HEADER ================= */}
       <header style={styles.header}>
-        
-        {/* Left: Sidebar toggle */}
+        {/* Left */}
         <button onClick={toggleSidebar} style={styles.hamburger}>
           ☰
         </button>
 
-        {/* Center: School Name (from DB later) */}
-        <div style={styles.schoolName}>
-          School Name Here
-        </div>
+        {/* Center */}
+        <div style={styles.schoolName}>{schoolName}</div>
 
-        {/* Right: Profile placeholder */}
+        {/* Right */}
         <div style={styles.rightSection}>
-          👤
+          <span style={{ marginRight: 15 }}>🔔</span>
+
+          <button onClick={toggleTheme} style={styles.themeBtn}>
+            {darkMode ? "🌙" : "☀️"}
+          </button>
+
+          <span
+            style={styles.profile}
+            onClick={() => navigate("/librarian/profile")}
+          >
+            👤 {user.name}
+          </span>
         </div>
       </header>
 
-      {/* BODY */}
+      {/* ================= BODY ================= */}
       <div style={styles.body}>
-
         {/* SIDEBAR */}
         <aside
           style={{
             ...styles.sidebar,
-            width: sidebarOpen ? "220px" : "60px",
+            width: sidebarOpen ? "220px" : "70px",
           }}
         >
-          <p>Dashboard</p>
-          <p>Users</p>
-          <p>Messages</p>
-          <p>Settings</p>
+          <nav>
+            <Link to="/librarian" style={styles.link}>Overview</Link>
+            <Link to="/librarian/books" style={styles.link}>Books</Link>
+            <Link to="/librarian/reports" style={styles.link}>Reports</Link>
+            <Link to="/librarian/past-papers" style={styles.link}>Past Papers</Link>
+            <Link to="/librarian/profile" style={styles.link}>Profile</Link>
+          </nav>
+
+          {/* Logout at bottom */}
+          <div style={styles.logoutContainer}>
+            <button onClick={handleLogout} style={styles.logout}>
+              Logout
+            </button>
+          </div>
         </aside>
 
         {/* MAIN CONTENT */}
         <main style={styles.main}>
-          <h2>Welcome back 👋</h2>
-          {children}
+          <h2>
+            Welcome, {user.name} 👋
+          </h2>
+
+          {/* Dynamic Pages Render Here */}
+          <Outlet />
         </main>
       </div>
 
-      {/* FOOTER */}
+      {/* ================= FOOTER ================= */}
       <footer style={styles.footer}>
-        <span>© School Name - All rights reserved</span>
-        <button style={styles.logout}>Logout</button>
+        © {new Date().getFullYear()} {schoolName} - All rights reserved
       </footer>
-
     </div>
   );
 };
 
 export default DashboardLayout;
 
-/* ---------------- STYLES ---------------- */
+/* ================= STYLES ================= */
 
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
@@ -101,7 +137,21 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 
   rightSection: {
-    fontSize: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+
+  themeBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "18px",
+  },
+
+  profile: {
+    cursor: "pointer",
+    fontSize: "14px",
   },
 
   body: {
@@ -114,11 +164,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: "white",
     transition: "0.3s",
     padding: "10px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+
+  link: {
+    display: "block",
+    color: "white",
+    textDecoration: "none",
+    padding: "10px 0",
+  },
+
+  logoutContainer: {
+    marginTop: "auto",
   },
 
   main: {
     flex: 1,
-    background: "#f1f5f9",
     padding: "20px",
   },
 
@@ -126,16 +189,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: "40px",
     background: "#e2e8f0",
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: "0 15px",
+    justifyContent: "center",
   },
 
   logout: {
+    width: "100%",
     background: "red",
     color: "white",
     border: "none",
-    padding: "5px 10px",
+    padding: "10px",
     cursor: "pointer",
   },
 };
